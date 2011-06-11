@@ -1,16 +1,60 @@
 JOGO AMAZONAS
 
-Desenvolvido por Edipo Deon Terra
+Desenvolvido por Edipo Deon Terra e Pedro Ricardo Ciotta
 
-Arquivos necessarios para o funcionamento e compilacao do sistema:
- - tabuleiro (monta o tabuleiro sem pecas)
- - amazona (arquivo geral que organiza todos os arquivos. Possui o main de todos os arquivos)
- - pecas(recebe a matriz com as pecas e flechas e monta no tabuleiro do programa)
- - movimentacao (recebe as cordenadas da peca a ser movimentada e as cordenadas finais para onde vai ser movimentado e define se pode ser feito ou nao. Se sim, movimenta, C.C. retorna a mensagem que nao pode movimentar)
- - situacao do jogo (verifica se esta acabou o jogo ou nao. E executado ao fim de cada movimento)
- - teste(arquivo que possui um main, mas possui a lista de testes que serao executados durante o processo de desenvolvimento)
- - 
- - 
- - 
+Definicao e requisitos para desenvolvimento do programa:
+ - Tabuleiro: fica responsavel por manter a interface atualizada com as interacoes com o jogo em si.
+ - Jogo: processo principal, onde so termina quando o usuario decidir.
+ - Pecas 
+ - Situacao do Jogo
+ - Movimento
+ - Troca Jogadores
+ - Entrada de Dados
+ - Testes: simulador de jogadas para automatizar e simplificar o desenvolvimento
+ 
+ Documentacao de desenvolvimento e funcionamento do jogo:
+ 1) Jogo:
+  O programa inicia, montando o menu para que o usuario defina o que deseja fazer no programa.
+    MENU:
+      - INICIAR JOGO
+      - SAIR
+
+
+
+ 2) Tabuleiro:
+  A cada interacao, alteracao e qualquer coisa que for referente ao jogo, movimentacao, etc, o programa atualiza a tela para que mantenha consistencia entre o que se ve na tela e o que foi realmente alterado no programa.
+  Em cada uma dessas atualizacoes, o programa limpa o que ja foi criado e monta tudo novamente, inserindo as pecas, flechas e alterando as posicoes das pecas que se movimentaram.
+
+
+
+ 3) Pecas:
+  Executa as acoes das pecas usando a definida opcao conforme vez da jogada. Aqui testa que peca esta jogando no momento. 
+  
+
+
+
+ 4) Situacao do Jogo:
+  Funcao que sempre verifica a situacao que as pecas de cada jogador se encontra. Quando todas as pecas de um jogador estiver ocupado, o jogo termina, ou quando qualquer um dos jogadores nao conseguir fazer uma jogada valida (movimentar a peca e lancar uma flecha com a mesma peca movimentada).
+
+
+
+ 5) Movimento:
+  Fica de responsavel pela movimentacao das pecas dentro do tabuleiro. A movimentacao sera feita por coordenadas, usando linha e coluna do tabuleiro. Estas depois serao testadas para a validacao de jogadas validas ou nao.
+
+
+  
+ 6) Troca de Jogadores:
+  Funcao que, a cada jogada, fica alterando entre os jogadores para que o mesmo nao jogue duas vezes consecutivas.
+
+
+
+ 7) Entrada de Dados:
+  E esse processo que vai ficar como responsavel pela leitura das posicoes iniciais e finais para o movimento.
+
+
+
+ 8) Testes:
+  Parte do processo que nao vai ser executado pelo programa quando este entrar em sua forma definitiva. Ele faz movimentacoes, entradas e jogadas para testar o funcionamento do programa. Como se fosse as sequencias usadas pelo proprio programa. Processo que pode ser feito passo a passo ou "corrido", para que execute mais rapido. O passo a passo seria para ver o funcionamento do programa em relacao as interacoes.
+
 
 
