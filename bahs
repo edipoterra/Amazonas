@@ -1,7 +1,0 @@
-git init
-touch README
-cat readme.txt > README
-git add README
-git commit -m 'first commit'
-git remote add origin https://edipoterra@github.com/edipoterra/Amazonas.git
-git push -u origin master

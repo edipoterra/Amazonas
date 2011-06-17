@@ -1,5 +1,5 @@
-# Para escrever comentarios ##
 ################## Makefile ####################
+# Processo de compilacao de todos os arquivos ##
 all: tabuleiro
 tabuleiro: tabuleiro.o pecas.o amazona.o
 	gcc -o amazona tabuleiro.o pecas.o amazona.o
