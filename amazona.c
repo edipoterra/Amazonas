@@ -42,7 +42,7 @@ void desenhaTela(){
 	imprimeTabuleiro();
 	montaPecas(amazonas);
 	printf("\033[033;0f");
-	if (vezJogador == 1){
+	if (vezJogador){ /* se for 1, imprime brancas, senao imprime pretas */
 		printf("Pecas Brancas:\n");
 	}
 	else {
@@ -54,7 +54,6 @@ void desenhaTela(){
 int validaCoordenadas(int num, char carac){
 	if ((num < 1) || (num > 10)){
 		desenhaTela();
-		printf("Coordenada Invalida! X\n");
 		return 0; 
 	}
 	if ((carac != 'A') && (carac != 'a') &&
@@ -69,9 +68,104 @@ int validaCoordenadas(int num, char carac){
 		(carac != 'J') && (carac != 'j')){
 			
 		desenhaTela();
-		printf("Coordenada Invalida! Y\n");
 		return 0;
 	}
+	return 1;
+}
+
+
+/* valida jogadas verificando posicoes, intervalo da movimentacao e coisas do tipo */
+int validaMovimentacao(int xi, char yi, int xf, char yf){
+	int yni = 0;
+	int ynf = 0;
+	
+	char texto[3]; /* variavel para esperar a interacao do usuario */
+	
+	yni = trocaTipo(yi);
+	ynf = trocaTipo(yf);
+	xi--;
+	xf--;
+	yni--;
+	ynf--;
+	
+	printf("XI: %i, YI: %i, XF: %i, YF: %i", xi, yni, xf, ynf);
+	scanf("%s", texto);
+	
+	if(vezJogador){
+		/* Jogada das pecas Brancas, testa se peca selecionada e branca*/
+		if(amazonas[xi][yni] != 'B'){
+			printf("Peca selecionada nao e Branca. Selecione uma peca Branca!\n");
+			scanf("%s", texto);
+			return 0;	
+		}
+	}
+	else {
+		/* Jogada das pecas Pretas, testa se peca selecionada e preta */
+		if(amazonas[xi][yni] != 'P'){
+			printf("Peca selecionada nao e Preta. Selecione uma peca Preta!\n");
+			scanf("%s", texto);
+			return 0;
+		}
+	}
+	
+	/* testa se posicao final ja esta ocupada */
+	if(amazonas[xf][ynf] != ' '){
+		printf("Destino ja esta ocupado. Selecione outro destino!\n");
+		scanf("%s", texto);
+		return 0;
+	}
+	if ((xi == xf) && (yni == ynf)){
+		printf("Coordenadas iguais. Defina um destino diferente do inicio!\n");
+		scanf("%s", texto);
+		return 0;
+	}
+
+	if (xi == xf){
+		printf("Movimentacao Horizontal\n");
+		scanf("%s", texto);
+	}
+	else{
+		if (yni == ynf){
+			printf("Movimentacao Vertical\n");
+			scanf("%s", texto);
+		}
+		else {
+			if ((xi - xf) == (yni - ynf)){
+				printf("Movimentacao diagonal direita\n");
+				scanf("%s", texto);	
+			}
+			else {
+				if((xi - xf) == ((yni - ynf) * -1)){
+					printf("Movimentacao diagonal esquerda\n");
+					scanf("%s", texto);	
+				}
+				else {
+					printf("Movimentacao invalida\n");
+					scanf("%s", texto);	
+					return 0;
+				}
+			}
+		}
+	}
+	
+	/*
+	testa todos os sentidos de movimentacoes possiveis:
+		Horizontal: XI = XF ===> 1,2 -> 1,4
+		Vertical: YNI = YNF ===> 2,3 -> 4,3
+		Diagonal esquerda: (XI - XF) = (YNI - YNF) ===> 0,1 -> 2,3
+		Diagonal Direita: (XI - XF) = ((YNI - YNF) * -1) ===> 9,5 -> 7,7
+	Se nao suprir esses casos, a movimentacao nao pode ser feita, dando mensagem de erro na tela...
+		
+	Depois de verificar o sentido da movimentacao, ver se nao existe nada no meio da movimentacao
+	Se existir, mensagem na tela que nao pode pular sobre pecas.
+	*/
+	
+	scanf("%s", texto);
+	
+	/* Se estiver todo certo, nesse mesmo processo ele executa a movimentacao, definindo sua nova 
+	posicao e limpando a poscao anterior. O movimento seguinte sera o lancamento da flecha, seguindo 
+	as mesmas regras que a movimentacao */
+	
 	return 1;
 }
 
@@ -113,7 +207,14 @@ void leCoordPeca(){
 		}
 		
 		if (validaCoordenadas(numFim,caracFim)){
-			printf("validando e executando movimentacao\n");
+			/* testar validacao para executar movimentacao de forma correta. */
+			if (validaMovimentacao(numIni, caracIni, numFim, caracFim)){
+				printf("Movimentacao OK\n");
+			}
+			else {
+				goto INICIAL;
+			}
+			
 			leCoorFlecha();
 		}
 		else {
@@ -125,22 +226,6 @@ void leCoordPeca(){
 	}
 	return;
 }
-
-/* valida jogadas verificando posicoes e blablabla */
-void validaMovimentacao(){
-	printf("Valida movimentacao");
-}
-
-/*  processo que monta as mensagens para executar no jogo 
-void montaMensagens(){
-	if (vezJogador == 1){
-		printf("Pecas Brancas:\n");
-	}
-	else {
-		printf("Pecas Pretas:\n");
-	}
-	leCoordPeca();
-} */
 
 int main(){
 	system("clear");
