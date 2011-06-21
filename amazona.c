@@ -76,6 +76,7 @@ int validaCoordenadas(int num, char carac){
 
 /* valida jogadas verificando posicoes, intervalo da movimentacao e coisas do tipo */
 int validaMovimentacao(int xi, char yi, int xf, char yf){
+	int i = 0;
 	int yni = 0;
 	int ynf = 0;
 	
@@ -96,7 +97,7 @@ int validaMovimentacao(int xi, char yi, int xf, char yf){
 		if(amazonas[xi][yni] != 'B'){
 			printf("Peca selecionada nao e Branca. Selecione uma peca Branca!\n");
 			scanf("%s", texto);
-			return 0;	
+			return 0;
 		}
 	}
 	else {
@@ -107,7 +108,7 @@ int validaMovimentacao(int xi, char yi, int xf, char yf){
 			return 0;
 		}
 	}
-	
+
 	/* testa se posicao final ja esta ocupada */
 	if(amazonas[xf][ynf] != ' '){
 		printf("Destino ja esta ocupado. Selecione outro destino!\n");
@@ -121,40 +122,122 @@ int validaMovimentacao(int xi, char yi, int xf, char yf){
 	}
 
 	if (xi == xf){
-		printf("Movimentacao Horizontal\n");
-		scanf("%s", texto);
+		if (yni > ynf){
+			for (i = yni - 1; i > ynf; i--){
+				if (amazonas[xi][i] != ' '){
+					printf("%c\n",amazonas[xi][i]);
+					break;
+				}
+			}
+		}
+		else {
+			for (i = yni + 1; i < ynf; i++){
+				if (amazonas[xi][i] != ' '){
+					printf("%c\n",amazonas[xi][i]);
+					break;
+				}
+			}
+		}
+		printf("I:%i YNF:%i\n",i, ynf);
+		if (i != ynf){
+			printf("Existe uma peca entre o movimento selecionado.\n");
+			scanf("%s", texto);
+			return 0;
+		}
 	}
 	else{
 		if (yni == ynf){
-			printf("Movimentacao Vertical\n");
-			scanf("%s", texto);
+			if (xi > xf){
+				for (i = xi - 1; i > xf; i--){
+					if (amazonas[i][yni] != ' '){
+						printf("%c\n",amazonas[xi][i]);
+						break;
+					}
+				}
+			}
+			else {
+				for (i = xi + 1; i < xf; i++){
+					if (amazonas[i][yni] != ' '){
+						printf("%c\n",amazonas[xi][i]);
+						break;
+					}
+				}
+			}
+			printf("I:%i YNF:%i\n",i, ynf);
+			if (i != xf){
+				printf("Existe uma peca entre o movimento selecionado.\n");
+				scanf("%s", texto);
+				return 0;
+			}
 		}
 		else {
 			if ((xi - xf) == (yni - ynf)){
-				printf("Movimentacao diagonal direita\n");
-				scanf("%s", texto);	
+				if (xi > xf){
+					for (i = xi - 1; i < xf; i--){
+						if (amazonas[i][yni - (xi - i)] != ' '){
+							printf("%c\n",amazonas[xi][i]);
+							break;
+						}
+					}
+				}
+				else {
+					for (i = xi + 1; i > xf; i++){
+						if (amazonas[i][yni + (i - xi)] != ' '){
+							printf("%c\n",amazonas[xi][i]);
+							break;
+						}
+					}
+				}
+				printf("I:%i YNF:%i\n",i, ynf);
+				if (i != xf){
+					printf("Existe uma peca entre o movimento selecionado.\n");
+					scanf("%s", texto);
+					return 0;					
+				}
 			}
 			else {
 				if((xi - xf) == ((yni - ynf) * -1)){
-					printf("Movimentacao diagonal esquerda\n");
-					scanf("%s", texto);	
+					if (xi > xf){
+						for (i = xi - 1; i < xf; i--){
+							if (amazonas[i][yni + (xi - i)] != ' '){
+								printf("%c\n",amazonas[xi][i]);
+								break;
+							}
+						}
+					}
+					else {
+						for (i = xi + 1; i > xf; i++){
+							if (amazonas[i][yni - (i - xi)] != ' '){
+								printf("%c\n",amazonas[xi][i]);
+								break;
+							}
+						}
+					}
+					printf("I:%i YNF:%i\n",i, ynf);
+					if (i != xf){
+						printf("Existe uma peca entre o movimento selecionado.\n");
+						scanf("%s", texto);
+						return 0;					
+					}
 				}
 				else {
 					printf("Movimentacao invalida\n");
-					scanf("%s", texto);	
+					scanf("%s", texto);
 					return 0;
 				}
 			}
 		}
 	}
+
+	/* movimentacao */
 	
+
 	/*
 	testa todos os sentidos de movimentacoes possiveis:
 		Horizontal: XI = XF ===> 1,2 -> 1,4
 		Vertical: YNI = YNF ===> 2,3 -> 4,3
 		Diagonal esquerda: (XI - XF) = (YNI - YNF) ===> 0,1 -> 2,3
 		Diagonal Direita: (XI - XF) = ((YNI - YNF) * -1) ===> 9,5 -> 7,7
-	Se nao suprir esses casos, a movimentacao nao pode ser feita, dando mensagem de erro na tela...
 		
 	Depois de verificar o sentido da movimentacao, ver se nao existe nada no meio da movimentacao
 	Se existir, mensagem na tela que nao pode pular sobre pecas.
