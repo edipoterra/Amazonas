@@ -1,12 +1,119 @@
 /* ===================== main.c ======================= */
-#include <stdio.h>
-#include <stdlib.h>
-#include "tabuleiro.h"
-#include "pecas.h"
+#include<stdio.h>
+#include<conio.h>
+#include<dos.h>
+#include <windows.h> // inclua esse header se for usar no devc++
+//#include <cstdlib> // inclua esse header se for usar no devc++
+
+void gotoxy(int x, int y){
+HANDLE hstdout;
+    // primeiro pega o handle do stdou STD_OUTPUT_HANDLE
+    hstdout = GetStdHandle(STD_OUTPUT_HANDLE);
+    //prestes a mover o curor para 10,10
+    SetConsoleCursorPosition(hstdout,(COORD) {y,x});
+    // done!
+}
+
+/* ========== Processo que imprime o tabuleiro ============ */
+void imprimeTabuleiro(){
+  int i = 0;
+  int j = 0;
+  gotoxy(0,0);
+  printf("|  A   |  B   |  C   |  D   |  E   |  F   |  G   |  H   |  I   |  J   |\n");
+  printf("|------|------|------|------|------|------|------|------|------|------|--\n");
+  for (i = 0; i < 10; i++){
+    for (j = 0; j < 2; j++){
+      if (j % 2 == 1){
+        printf("|      |      |      |      |      |      |      |      |      |      |\n");
+      }
+      else {
+        printf("|      |      |      |      |      |      |      |      |      |      | %i\n", i+1);
+      }
+    }
+    if (i < 9)
+      printf("|------+------+------+------+------+------+------+------+------+------|--\n");
+    else
+      printf("|---------------------------------------------------------------------|\n");
+  }
+}
+
+/* processo que imprime as pecas na posicao passada por parametro */
+void imprimePecas(char tipoPeca, int x, int y){
+  if ((tipoPeca != 'B') &&
+    (tipoPeca != 'P') &&
+    (tipoPeca != 'F') &&
+    (x > 10 ) &&
+    (y == 0)){
+    gotoxy(34,0);
+    printf("Jogada Invalida!\n");
+    return;
+  }
+  x = x * 3;
+  y = (y - 1) * 7 + 3;
+
+  x--;
+  y--;
+
+  if (tipoPeca == 'B'){
+    gotoxy(x,y);
+    x++;
+    printf("_/\\_\n");
+    gotoxy(x,y);
+    printf(" \\/ \n");
+  }
+  else {
+    if (tipoPeca == 'P'){
+      gotoxy(x,y);
+      x++;
+      printf("/||\\\n");
+      gotoxy(x,y);
+      printf(" \\/ \n");
+    }
+    else{
+      if (tipoPeca == 'F'){
+        gotoxy(x,y);
+        x++;
+        printf("/|\\\n");
+        gotoxy(x,y);
+        printf(" | \n");
+      }
+    }
+  }
+}
+
+/* recebe letra e converte para numero, para parametrizar coordenadas */
+int trocaTipo(char letra){
+  switch (letra){
+    case 'A':	return 1;
+    case 'B':	return 2;
+    case 'C':	return 3;
+    case 'D':	return 4;
+    case 'E':	return 5;
+    case 'F':	return 6;
+    case 'G':	return 7;
+    case 'H':	return 8;
+    case 'I':	return 9;
+    case 'J':	return 10;
+    default: 	return 0;
+  }
+}
+
+void montaPecas(char amaz[10][10]){
+  int i, j;
+
+  for(i = 0; i < 10; i++){
+    for(j = 0; j < 10; j++){
+      if (amaz[i][j] != ' '){
+        imprimePecas(amaz[i][j],i+1,j+1);
+      }
+    }
+  }
+}
+
 
 /* ==== Matriz principal do programa ==== */
 char amazonas[10][10] = {
-	{' ',' ',' ','P',' ',' ','P',' ',' ',' '},
+        {' ',' ',' ','P',' ',' ','P',' ',' ',' '},
 		{' ',' ',' ',' ',' ',' ',' ',' ',' ',' '},
 		{' ',' ',' ',' ',' ',' ',' ',' ',' ',' '},
 		{'P',' ',' ',' ',' ',' ',' ',' ',' ','P'},
@@ -38,10 +145,10 @@ void leCoorFlecha(){
 
 /* Atualiza e desenha a tela com as posicoes  */
 void desenhaTela(){
-	system("clear");
+	system("cls");
 	imprimeTabuleiro();
 	montaPecas(amazonas);
-	printf("\033[033;0f");
+	gotoxy(33,0);
 	if (vezJogador){ /* se for 1, imprime brancas, senao imprime pretas */
 		printf("Pecas Brancas:\n");
 	}
@@ -54,7 +161,7 @@ void desenhaTela(){
 int validaCoordenadas(int num, char carac){
 	if ((num < 1) || (num > 10)){
 		desenhaTela();
-		return 0; 
+		return 0;
 	}
 	if ((carac != 'A') && (carac != 'a') &&
 		(carac != 'B') && (carac != 'b') &&
@@ -66,7 +173,7 @@ int validaCoordenadas(int num, char carac){
 		(carac != 'H') && (carac != 'h') &&
 		(carac != 'I') && (carac != 'i') &&
 		(carac != 'J') && (carac != 'j')){
-			
+
 		desenhaTela();
 		return 0;
 	}
@@ -79,19 +186,19 @@ int validaMovimentacao(int xi, char yi, int xf, char yf){
 	int i = 0;
 	int yni = 0;
 	int ynf = 0;
-	
+
 	char texto[3]; /* variavel para esperar a interacao do usuario */
-	
+
 	yni = trocaTipo(yi);
 	ynf = trocaTipo(yf);
 	xi--;
 	xf--;
 	yni--;
 	ynf--;
-	
+
 	printf("XI: %i, YI: %i, XF: %i, YF: %i", xi, yni, xf, ynf);
 	scanf("%s", texto);
-	
+
 	if(vezJogador){
 		/* Jogada das pecas Brancas, testa se peca selecionada e branca*/
 		if(amazonas[xi][yni] != 'B'){
@@ -192,7 +299,7 @@ int validaMovimentacao(int xi, char yi, int xf, char yf){
 				if (i != xf){
 					printf("Existe uma peca entre o movimento selecionado.\n");
 					scanf("%s", texto);
-					return 0;					
+					return 0;
 				}
 			}
 			else {
@@ -217,7 +324,7 @@ int validaMovimentacao(int xi, char yi, int xf, char yf){
 					if (i != xf){
 						printf("Existe uma peca entre o movimento selecionado.\n");
 						scanf("%s", texto);
-						return 0;					
+						return 0;
 					}
 				}
 				else {
@@ -230,7 +337,7 @@ int validaMovimentacao(int xi, char yi, int xf, char yf){
 	}
 
 	/* movimentacao */
-	
+
 
 	/*
 	testa todos os sentidos de movimentacoes possiveis:
@@ -238,17 +345,17 @@ int validaMovimentacao(int xi, char yi, int xf, char yf){
 		Vertical: YNI = YNF ===> 2,3 -> 4,3
 		Diagonal esquerda: (XI - XF) = (YNI - YNF) ===> 0,1 -> 2,3
 		Diagonal Direita: (XI - XF) = ((YNI - YNF) * -1) ===> 9,5 -> 7,7
-		
+
 	Depois de verificar o sentido da movimentacao, ver se nao existe nada no meio da movimentacao
 	Se existir, mensagem na tela que nao pode pular sobre pecas.
 	*/
-	
+
 	scanf("%s", texto);
-	
-	/* Se estiver todo certo, nesse mesmo processo ele executa a movimentacao, definindo sua nova 
-	posicao e limpando a poscao anterior. O movimento seguinte sera o lancamento da flecha, seguindo 
+
+	/* Se estiver todo certo, nesse mesmo processo ele executa a movimentacao, definindo sua nova
+	posicao e limpando a poscao anterior. O movimento seguinte sera o lancamento da flecha, seguindo
 	as mesmas regras que a movimentacao */
-	
+
 	return 1;
 }
 
@@ -259,7 +366,7 @@ void leCoordPeca(){
 	int numFim;
 	char caracIni;
 	char caracFim;
-	
+
 	INICIAL:
 	desenhaTela();
 	printf("Entre com as coordenadas iniciais da peca: \n");
@@ -288,7 +395,7 @@ void leCoordPeca(){
 			caracFim = texto[1];
 			numFim = texto[0] - '0';
 		}
-		
+
 		if (validaCoordenadas(numFim,caracFim)){
 			/* testar validacao para executar movimentacao de forma correta. */
 			if (validaMovimentacao(numIni, caracIni, numFim, caracFim)){
@@ -297,7 +404,7 @@ void leCoordPeca(){
 			else {
 				goto INICIAL;
 			}
-			
+
 			leCoorFlecha();
 		}
 		else {
@@ -311,17 +418,14 @@ void leCoordPeca(){
 }
 
 int main(){
-	system("clear");
+	system("cls");
 	imprimeTabuleiro();
-	montaPecas(amazonas); 
+	montaPecas(amazonas);
 
 	while (!fimJogo){
 		leCoordPeca();
 		trocaJogador();
 	}
-/*	leCoordPeca();
-	leCoordPeca();
-	leCoordPeca(); */
 
 	return 0;
 }
