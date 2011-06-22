@@ -125,6 +125,9 @@ char amazonas[10][10] = {
 		{' ',' ',' ','B',' ',' ','B',' ',' ',' '}
 };
 
+int qtdeBrancas = 0;
+int qtdePretas = 0;
+
 int vezJogador = 0; /* faz a troca de jogadores */
 int fimJogo = 0; 	/* define o fim do jogo */
 
@@ -414,6 +417,9 @@ void leCoordPeca(){
 	else {
 		goto INICIAL;
 	}
+
+	validaJogada();
+
 	return;
 }
 
@@ -430,3 +436,52 @@ int main(){
 	return 0;
 }
 
+/* Verifica se a peca esta cercada */
+char pecaCercada(char i, char j){
+    if (i==0)
+        if (j==0) return amazonas[i+1][j] != ' ' && amazonas[i+1][j+1] != ' ' && amazonas[i][j+1] != ' ';
+        else
+            if (j == 9) return amazonas[i][j-1] != ' ' && amazonas[i+1][j-1] != ' ' && amazonas[i+1][j] != ' ';
+            else return amazonas[i][j-1] != ' ' && amazonas[i+1][j-1] != ' ' && amazonas[i+1][j] != ' ' && amazonas[i+1][j+1] != ' ' && amazonas[i][j+1] != ' ';
+    else
+        if (i == 9)
+            if (j==0) return amazonas[i-1][j] != ' ' && amazonas[i-1][j+1] != ' ' && amazonas[i][j+1] != ' ';
+            else
+                if (j == 9) return amazonas[i][j-1] != ' ' && amazonas[i-1][j-1] != ' ' && amazonas[i-1][j] != ' ';
+                else return amazonas[i][j-1] != ' ' && amazonas[i-1][j-1] != ' ' && amazonas[i-1][j] != ' ' && amazonas[i+1][j+1] != ' ' && amazonas[i][j+1] != ' ';
+        else
+            if (j==0) return amazonas[i-1][j] != ' ' && amazonas[i-1][j+1] != ' ' && amazonas[i][j+1] != ' '&& amazonas[i+1][j+1] != ' ' && amazonas[i+1][j] != ' ';
+            else
+                if (j == 9) return amazonas[i-1][j] != ' ' && amazonas[i-1][j-1] != ' ' && amazonas[i][j-1] != ' '&& amazonas[i+1][j-1] != ' ' && amazonas[i+1][j] != ' ';
+                else return amazonas[i-1][j-1] != ' ' &&  amazonas[i-1][j] != ' ' && amazonas[i-1][j+1] != ' ' && amazonas[i][j-1] != ' ' && amazonas[i][j+1] != ' ' && amazonas[i+1][j-1] != ' ' &&  amazonas[i=1][j] != ' ' &&   amazonas[i+1][j+1] != ' ';
+    return 0;
+}
+
+
+/* Valida as pecas da jogada */
+void validaJogada(){
+    int i = 0;
+    int j = 0;
+
+    for(i = 0; i < 10; i++){
+        for(j = 0; j < 10; j++){
+            if ((amazonas[i][y] == 'P') || (amazonas[i][y] == 'B')){
+                if (pecaCercada(i, y)){
+                    if (vezJogador) qtdeBrancas++;
+                    else qtdePretas++;
+                }
+            }
+        }
+    }
+
+    if(qtdeBrancas == 4){
+        fimJogo++;
+        printf("O Jogador com as pecas de cor preta ganhou o jogo");
+        return;
+    }
+    if(qtdePretas == 4){
+        fimJogo++;
+        printf("O Jogador com as pecas de cor branca ganhou o jogo");
+        return;
+    }
+}
