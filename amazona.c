@@ -5,13 +5,30 @@
 #include <windows.h> // inclua esse header se for usar no devc++
 //#include <cstdlib> // inclua esse header se for usar no devc++
 
+/* ==== Matriz principal do programa ==== */
+char amazonas[10][10] = {
+        {' ',' ',' ','P',' ',' ','P',' ',' ',' '},
+		{' ',' ',' ',' ',' ',' ',' ',' ',' ',' '},
+		{' ',' ',' ',' ',' ',' ',' ',' ',' ',' '},
+		{'P',' ',' ',' ',' ',' ',' ',' ',' ','P'},
+		{' ',' ',' ',' ',' ',' ',' ',' ',' ',' '},
+		{' ',' ',' ',' ',' ',' ',' ',' ',' ',' '},
+		{'B',' ',' ',' ',' ',' ',' ',' ',' ','B'},
+		{' ',' ',' ',' ',' ',' ',' ',' ',' ',' '},
+		{' ',' ',' ',' ',' ',' ',' ',' ',' ',' '},
+		{' ',' ',' ','B',' ',' ','B',' ',' ',' '}
+};
+
+int qtdeBrancas = 0;
+int qtdePretas = 0;
+
+int vezJogador = 0; /* faz a troca de jogadores */
+int fimJogo = 0; 	/* define o fim do jogo */
+
 void gotoxy(int x, int y){
 HANDLE hstdout;
-    // primeiro pega o handle do stdou STD_OUTPUT_HANDLE
     hstdout = GetStdHandle(STD_OUTPUT_HANDLE);
-    //prestes a mover o curor para 10,10
     SetConsoleCursorPosition(hstdout,(COORD) {y,x});
-    // done!
 }
 
 /* ========== Processo que imprime o tabuleiro ============ */
@@ -110,27 +127,6 @@ void montaPecas(char amaz[10][10]){
   }
 }
 
-
-/* ==== Matriz principal do programa ==== */
-char amazonas[10][10] = {
-        {' ',' ',' ','P',' ',' ','P',' ',' ',' '},
-		{' ',' ',' ',' ',' ',' ',' ',' ',' ',' '},
-		{' ',' ',' ',' ',' ',' ',' ',' ',' ',' '},
-		{'P',' ',' ',' ',' ',' ',' ',' ',' ','P'},
-		{' ',' ',' ',' ',' ',' ',' ',' ',' ',' '},
-		{' ',' ',' ',' ',' ',' ',' ',' ',' ',' '},
-		{'B',' ',' ',' ',' ',' ',' ',' ',' ','B'},
-		{' ',' ',' ',' ',' ',' ',' ',' ',' ',' '},
-		{' ',' ',' ',' ',' ',' ',' ',' ',' ',' '},
-		{' ',' ',' ','B',' ',' ','B',' ',' ',' '}
-};
-
-int qtdeBrancas = 0;
-int qtdePretas = 0;
-
-int vezJogador = 0; /* faz a troca de jogadores */
-int fimJogo = 0; 	/* define o fim do jogo */
-
 /* funcao que faz a troca de jogador */
 void trocaJogador(){
 	if (vezJogador == 1) {
@@ -141,12 +137,6 @@ void trocaJogador(){
 	}
 }
 
-/* Le posicao final da flecha. Posicao inicial e a posicao final da peca */
-void leCoorFlecha(){
-	printf("Le coordenadas flecha");
-}
-
-/* Atualiza e desenha a tela com as posicoes  */
 void desenhaTela(){
 	system("cls");
 	imprimeTabuleiro();
@@ -181,6 +171,236 @@ int validaCoordenadas(int num, char carac){
 		return 0;
 	}
 	return 1;
+}
+
+int validaLancamento(int xi, int yi, int xf, char yf){
+	int i = 0;
+	int yni = 0;
+	int ynf = 0;
+
+	char texto[3];
+
+	yni = yi;
+	ynf = trocaTipo(yf);
+	xi--;
+	xf--;
+	yni--;
+	ynf--;
+
+	printf("XI: %i, YI: %i, XF: %i, YF: %i", xi, yni, xf, ynf);
+	scanf("%s", texto);
+
+	/* testa se posicao final ja esta ocupada */
+	if(amazonas[xf][ynf] != ' '){
+		printf("Destino ja esta ocupado. Selecione outro destino!\n");
+		scanf("%s", texto);
+		return 0;
+	}
+	if ((xi == xf) && (yni == ynf)){
+		printf("Coordenadas iguais. Defina um destino diferente do inicio!\n");
+		scanf("%s", texto);
+		return 0;
+	}
+
+	if (xi == xf){
+		if (yni > ynf){
+			for (i = yni - 1; i > ynf; i--){
+				if (amazonas[xi][i] != ' '){
+					printf("%c\n",amazonas[xi][i]);
+					break;
+				}
+			}
+		}
+		else {
+			for (i = yni + 1; i < ynf; i++){
+				if (amazonas[xi][i] != ' '){
+					printf("%c\n",amazonas[xi][i]);
+					break;
+				}
+			}
+		}
+		printf("I:%i YNF:%i\n",i, ynf);
+		if (i != ynf){
+			printf("Existe uma peca entre o lancamento selecionado.\n");
+			scanf("%s", texto);
+			return 0;
+		}
+	}
+	else{
+		if (yni == ynf){
+			if (xi > xf){
+				for (i = xi - 1; i > xf; i--){
+					if (amazonas[i][yni] != ' '){
+						printf("%c\n",amazonas[xi][i]);
+						break;
+					}
+				}
+			}
+			else {
+				for (i = xi + 1; i < xf; i++){
+					if (amazonas[i][yni] != ' '){
+						printf("%c\n",amazonas[xi][i]);
+						break;
+					}
+				}
+			}
+			printf("I:%i YNF:%i\n",i, ynf);
+			if (i != xf){
+				printf("Existe uma peca entre o lancamento selecionado.\n");
+				scanf("%s", texto);
+				return 0;
+			}
+		}
+		else {
+			if ((xi - xf) == (yni - ynf)){
+				if (xi > xf){
+					for (i = xi - 1; i > xf; i--){
+						if (amazonas[i][yni - (xi - i)] != ' '){
+							printf("%c\n",amazonas[xi][i]);
+							break;
+						}
+					}
+				}
+				else {
+					for (i = xi + 1; i < xf; i++){
+						if (amazonas[i][yni + (i - xi)] != ' '){
+							printf("%c\n",amazonas[xi][i]);
+							break;
+						}
+					}
+				}
+				printf("I:%i YNF:%i\n",i, ynf);
+				if (i != xf){
+					printf("Existe uma peca entre o lancamento selecionado.\n");
+					scanf("%s", texto);
+					return 0;
+				}
+			}
+			else {
+				if((xi - xf) == ((yni - ynf) * -1)){
+					if (xi > xf){
+						for (i = xi - 1; i > xf; i--){
+							if (amazonas[i][yni + (xi - i)] != ' '){
+								printf("%c\n",amazonas[xi][i]);
+								break;
+							}
+						}
+					}
+					else {
+						for (i = xi + 1; i < xf; i++){
+							if (amazonas[i][yni - (i - xi)] != ' '){
+								printf("%c\n",amazonas[xi][i]);
+								break;
+							}
+						}
+					}
+					printf("I:%i YNF:%i\n",i, ynf);
+					if (i != xf){
+						printf("Existe uma peca entre o lancamento selecionado.\n");
+						scanf("%s", texto);
+						return 0;
+					}
+				}
+				else {
+					printf("Lancamento invalido\n");
+					scanf("%s", texto);
+					return 0;
+				}
+			}
+		}
+	}
+
+    amazonas[xf][ynf] = 'F';
+
+	scanf("%s", texto);
+
+	return 1;
+}
+
+/* Le posicao final da flecha. Posicao inicial e a posicao final da peca */
+void leCoorFlecha(int coorXf, int coorYf){
+    char texto[3];
+	int numFim;
+	char caracFim;
+
+	FLECHA:
+	desenhaTela();
+	printf("Entre com as coordenadas do destino da flecha: \n");
+	scanf("%s",texto);
+
+	if (texto[2] != '\0'){
+		caracFim = texto[2];
+		numFim = (texto[0] - '0') * 10 + (texto[1] - '0');
+	}
+	else{
+		caracFim = texto[1];
+		numFim = texto[0] - '0';
+    }
+
+    if (validaCoordenadas(numFim,caracFim)){
+		/* testar validacao para executar movimentacao de forma correta. */
+		if (validaLancamento(coorXf, coorYf, numFim, caracFim)){
+			printf("Movimentacao OK\n");
+		}
+		else{
+		    goto FLECHA;
+		}
+	}
+	else {
+		goto FLECHA;
+	}
+
+	return;
+}
+
+/* Verifica se a peca esta cercada */
+char pecaCercada(char i, char j){
+    if (i==0)
+        if (j==0) return amazonas[i+1][j] != ' ' && amazonas[i+1][j+1] != ' ' && amazonas[i][j+1] != ' ';
+        else
+            if (j == 9) return amazonas[i][j-1] != ' ' && amazonas[i+1][j-1] != ' ' && amazonas[i+1][j] != ' ';
+            else return amazonas[i][j-1] != ' ' && amazonas[i+1][j-1] != ' ' && amazonas[i+1][j] != ' ' && amazonas[i+1][j+1] != ' ' && amazonas[i][j+1] != ' ';
+    else
+        if (i == 9)
+            if (j==0) return amazonas[i-1][j] != ' ' && amazonas[i-1][j+1] != ' ' && amazonas[i][j+1] != ' ';
+            else
+                if (j == 9) return amazonas[i][j-1] != ' ' && amazonas[i-1][j-1] != ' ' && amazonas[i-1][j] != ' ';
+                else return amazonas[i][j-1] != ' ' && amazonas[i-1][j-1] != ' ' && amazonas[i-1][j] != ' ' && amazonas[i+1][j+1] != ' ' && amazonas[i][j+1] != ' ';
+        else
+            if (j==0) return amazonas[i-1][j] != ' ' && amazonas[i-1][j+1] != ' ' && amazonas[i][j+1] != ' '&& amazonas[i+1][j+1] != ' ' && amazonas[i+1][j] != ' ';
+            else
+                if (j == 9) return amazonas[i-1][j] != ' ' && amazonas[i-1][j-1] != ' ' && amazonas[i][j-1] != ' '&& amazonas[i+1][j-1] != ' ' && amazonas[i+1][j] != ' ';
+                else return amazonas[i-1][j-1] != ' ' &&  amazonas[i-1][j] != ' ' && amazonas[i-1][j+1] != ' ' && amazonas[i][j-1] != ' ' && amazonas[i][j+1] != ' ' && amazonas[i+1][j-1] != ' ' &&  amazonas[i=1][j] != ' ' &&   amazonas[i+1][j+1] != ' ';
+    return 0;
+}
+
+
+/* Valida as pecas da jogada */
+void validaJogada(){
+    int i = 0;
+    int j = 0;
+
+    for(i = 0; i < 10; i++){
+        for(j = 0; j < 10; j++){
+            if ((amazonas[i][j] == 'P') || (amazonas[i][j] == 'B')){
+                if (pecaCercada(i, j)){
+                    if (vezJogador) qtdeBrancas++;
+                    else qtdePretas++;
+                }
+            }
+        }
+    }
+
+    if(qtdeBrancas == 4){
+        fimJogo++;
+        printf("O Jogador com as pecas de cor preta ganhou o jogo");
+        return;
+    }
+    if(qtdePretas == 4){
+        fimJogo++;
+        printf("O Jogador com as pecas de cor branca ganhou o jogo");
+        return;
+    }
 }
 
 
@@ -273,7 +493,7 @@ int validaMovimentacao(int xi, char yi, int xf, char yf){
 					}
 				}
 			}
-			printf("I:%i YNF:%i\n",i, ynf);
+			printf("I:%i XF:%i\n",i, xf);
 			if (i != xf){
 				printf("Existe uma peca entre o movimento selecionado.\n");
 				scanf("%s", texto);
@@ -281,24 +501,32 @@ int validaMovimentacao(int xi, char yi, int xf, char yf){
 			}
 		}
 		else {
+		    /* Verificar a parte desse processo que nao esta funcionando corretamente */
 			if ((xi - xf) == (yni - ynf)){
+			    printf("antes do laco");
+			    scanf("%s", texto);
 				if (xi > xf){
-					for (i = xi - 1; i < xf; i--){
-						if (amazonas[i][yni - (xi - i)] != ' '){
+				    printf("Final menor");
+					for (i = xi - 1; i > xf; i--){
+						if (amazonas[i][yni - (xi - i) - 1] != ' '){
 							printf("%c\n",amazonas[xi][i]);
+                            scanf("%s", texto);
 							break;
 						}
 					}
 				}
 				else {
-					for (i = xi + 1; i > xf; i++){
-						if (amazonas[i][yni + (i - xi)] != ' '){
+				    printf("Final maior");
+				    scanf("%s", texto);
+					for (i = xi + 1; i < xf; i++){
+						if (amazonas[i][yni + (i - xi) - 1] != ' '){
 							printf("%c\n",amazonas[xi][i]);
+							scanf("%s", texto);
 							break;
 						}
 					}
 				}
-				printf("I:%i YNF:%i\n",i, ynf);
+				printf("I:%i XF:%i\n",i, xf);
 				if (i != xf){
 					printf("Existe uma peca entre o movimento selecionado.\n");
 					scanf("%s", texto);
@@ -306,9 +534,10 @@ int validaMovimentacao(int xi, char yi, int xf, char yf){
 				}
 			}
 			else {
+			    /* e desse processo tambem que esta dando merda, 1 em 1 funciona, mais que isso da pau! =P */
 				if((xi - xf) == ((yni - ynf) * -1)){
 					if (xi > xf){
-						for (i = xi - 1; i < xf; i--){
+						for (i = xi - 1; i > xf; i--){
 							if (amazonas[i][yni + (xi - i)] != ' '){
 								printf("%c\n",amazonas[xi][i]);
 								break;
@@ -316,14 +545,14 @@ int validaMovimentacao(int xi, char yi, int xf, char yf){
 						}
 					}
 					else {
-						for (i = xi + 1; i > xf; i++){
+						for (i = xi + 1; i < xf; i++){
 							if (amazonas[i][yni - (i - xi)] != ' '){
 								printf("%c\n",amazonas[xi][i]);
 								break;
 							}
 						}
 					}
-					printf("I:%i YNF:%i\n",i, ynf);
+					printf("I:%i XF:%i\n",i, xf);
 					if (i != xf){
 						printf("Existe uma peca entre o movimento selecionado.\n");
 						scanf("%s", texto);
@@ -340,24 +569,21 @@ int validaMovimentacao(int xi, char yi, int xf, char yf){
 	}
 
 	/* movimentacao */
-
-
-	/*
-	testa todos os sentidos de movimentacoes possiveis:
-		Horizontal: XI = XF ===> 1,2 -> 1,4
-		Vertical: YNI = YNF ===> 2,3 -> 4,3
-		Diagonal esquerda: (XI - XF) = (YNI - YNF) ===> 0,1 -> 2,3
-		Diagonal Direita: (XI - XF) = ((YNI - YNF) * -1) ===> 9,5 -> 7,7
-
-	Depois de verificar o sentido da movimentacao, ver se nao existe nada no meio da movimentacao
-	Se existir, mensagem na tela que nao pode pular sobre pecas.
-	*/
+    if (vezJogador){
+        amazonas[xf][ynf] = 'B';
+        amazonas[xi][yni] = ' ';
+    }
+    else {
+        amazonas[xf][ynf] = 'P';
+        amazonas[xi][yni] = ' ';
+    }
 
 	scanf("%s", texto);
 
 	/* Se estiver todo certo, nesse mesmo processo ele executa a movimentacao, definindo sua nova
 	posicao e limpando a poscao anterior. O movimento seguinte sera o lancamento da flecha, seguindo
 	as mesmas regras que a movimentacao */
+    leCoorFlecha(xf + 1, ynf + 1);
 
 	return 1;
 }
@@ -407,8 +633,6 @@ void leCoordPeca(){
 			else {
 				goto INICIAL;
 			}
-
-			leCoorFlecha();
 		}
 		else {
 			goto FINAL;
@@ -434,54 +658,4 @@ int main(){
 	}
 
 	return 0;
-}
-
-/* Verifica se a peca esta cercada */
-char pecaCercada(char i, char j){
-    if (i==0)
-        if (j==0) return amazonas[i+1][j] != ' ' && amazonas[i+1][j+1] != ' ' && amazonas[i][j+1] != ' ';
-        else
-            if (j == 9) return amazonas[i][j-1] != ' ' && amazonas[i+1][j-1] != ' ' && amazonas[i+1][j] != ' ';
-            else return amazonas[i][j-1] != ' ' && amazonas[i+1][j-1] != ' ' && amazonas[i+1][j] != ' ' && amazonas[i+1][j+1] != ' ' && amazonas[i][j+1] != ' ';
-    else
-        if (i == 9)
-            if (j==0) return amazonas[i-1][j] != ' ' && amazonas[i-1][j+1] != ' ' && amazonas[i][j+1] != ' ';
-            else
-                if (j == 9) return amazonas[i][j-1] != ' ' && amazonas[i-1][j-1] != ' ' && amazonas[i-1][j] != ' ';
-                else return amazonas[i][j-1] != ' ' && amazonas[i-1][j-1] != ' ' && amazonas[i-1][j] != ' ' && amazonas[i+1][j+1] != ' ' && amazonas[i][j+1] != ' ';
-        else
-            if (j==0) return amazonas[i-1][j] != ' ' && amazonas[i-1][j+1] != ' ' && amazonas[i][j+1] != ' '&& amazonas[i+1][j+1] != ' ' && amazonas[i+1][j] != ' ';
-            else
-                if (j == 9) return amazonas[i-1][j] != ' ' && amazonas[i-1][j-1] != ' ' && amazonas[i][j-1] != ' '&& amazonas[i+1][j-1] != ' ' && amazonas[i+1][j] != ' ';
-                else return amazonas[i-1][j-1] != ' ' &&  amazonas[i-1][j] != ' ' && amazonas[i-1][j+1] != ' ' && amazonas[i][j-1] != ' ' && amazonas[i][j+1] != ' ' && amazonas[i+1][j-1] != ' ' &&  amazonas[i=1][j] != ' ' &&   amazonas[i+1][j+1] != ' ';
-    return 0;
-}
-
-
-/* Valida as pecas da jogada */
-void validaJogada(){
-    int i = 0;
-    int j = 0;
-
-    for(i = 0; i < 10; i++){
-        for(j = 0; j < 10; j++){
-            if ((amazonas[i][y] == 'P') || (amazonas[i][y] == 'B')){
-                if (pecaCercada(i, y)){
-                    if (vezJogador) qtdeBrancas++;
-                    else qtdePretas++;
-                }
-            }
-        }
-    }
-
-    if(qtdeBrancas == 4){
-        fimJogo++;
-        printf("O Jogador com as pecas de cor preta ganhou o jogo");
-        return;
-    }
-    if(qtdePretas == 4){
-        fimJogo++;
-        printf("O Jogador com as pecas de cor branca ganhou o jogo");
-        return;
-    }
 }
