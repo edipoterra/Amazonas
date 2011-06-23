@@ -1,9 +1,10 @@
 /* ===================== main.c ======================= */
-#include<stdio.h>
-#include<conio.h>
-#include<dos.h>
+#include <stdio.h>
+#include <conio.h>
+#include <dos.h>
 #include <windows.h> // inclua esse header se for usar no devc++
 //#include <cstdlib> // inclua esse header se for usar no devc++
+#include <stdlib.h>
 
 /* ==== Matriz principal do programa ==== */
 char amazonas[10][10] = {
@@ -19,12 +20,14 @@ char amazonas[10][10] = {
 		{' ',' ',' ','B',' ',' ','B',' ',' ',' '}
 };
 
+/* === Variaveis que verificam o fim do jogo === */
 int qtdeBrancas = 0;
 int qtdePretas = 0;
 
 int vezJogador = 0; /* faz a troca de jogadores */
 int fimJogo = 0; 	/* define o fim do jogo */
 
+/* ==== Processo que define em que coluna e linha o programa vai imprimir ==== */
 void gotoxy(int x, int y){
 HANDLE hstdout;
     hstdout = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -54,13 +57,13 @@ void imprimeTabuleiro(){
   }
 }
 
-/* processo que imprime as pecas na posicao passada por parametro */
+/* === Processo que imprime as pecas na posicao passada por parametro === */
 void imprimePecas(char tipoPeca, int x, int y){
   if ((tipoPeca != 'B') &&
-    (tipoPeca != 'P') &&
-    (tipoPeca != 'F') &&
-    (x > 10 ) &&
-    (y == 0)){
+      (tipoPeca != 'P') &&
+      (tipoPeca != 'F') &&
+      (x > 10 ) &&
+      (y == 0)){
     gotoxy(34,0);
     printf("Jogada Invalida!\n");
     return;
@@ -98,7 +101,7 @@ void imprimePecas(char tipoPeca, int x, int y){
   }
 }
 
-/* recebe letra e converte para numero, para parametrizar coordenadas */
+/* === Recebe letra e converte para numero, para parametrizar coordenadas === */
 int trocaTipo(char letra){
   switch (letra){
     case 'A':	return 1;
@@ -115,6 +118,7 @@ int trocaTipo(char letra){
   }
 }
 
+/* ==== Monta todas as pecas disponiveis no tabuleiro ==== */
 void montaPecas(char amaz[10][10]){
   int i, j;
 
@@ -127,7 +131,7 @@ void montaPecas(char amaz[10][10]){
   }
 }
 
-/* funcao que faz a troca de jogador */
+/* === Funcao que faz a troca de jogador === */
 void trocaJogador(){
 	if (vezJogador == 1) {
 		vezJogador = 0;
@@ -137,6 +141,7 @@ void trocaJogador(){
 	}
 }
 
+/* ===== Desenha tabuleiro, pecas, vez do jogador e seta posicao de mensagens ===== */
 void desenhaTela(){
 	system("cls");
 	imprimeTabuleiro();
@@ -150,29 +155,123 @@ void desenhaTela(){
 	}
 }
 
-/* processo de validacao das coordenadas passadas por parametro */
+/* === Processo de validacao das coordenadas passadas por parametro === */
 int validaCoordenadas(int num, char carac){
 	if ((num < 1) || (num > 10)){
 		desenhaTela();
 		return 0;
 	}
-	if ((carac != 'A') && (carac != 'a') &&
-		(carac != 'B') && (carac != 'b') &&
-		(carac != 'C') && (carac != 'c') &&
-		(carac != 'D') && (carac != 'd') &&
-		(carac != 'E') && (carac != 'e') &&
-		(carac != 'F') && (carac != 'f') &&
-		(carac != 'G') && (carac != 'g') &&
-		(carac != 'H') && (carac != 'h') &&
-		(carac != 'I') && (carac != 'i') &&
-		(carac != 'J') && (carac != 'j')){
-
+	if ((toupper(carac) <= 65) || (toupper(carac) >= 74) ){
 		desenhaTela();
 		return 0;
 	}
 	return 1;
 }
 
+/* ===== executa processo de caminhamento da matriz para encontrar algo no meio ===== */
+int analisaPeriodos(int xi, int yni, int xf, int ynf){
+    char texto[3];
+    int i = 0;
+    int j = 0;
+    if (xi == xf){
+		if (yni > ynf){
+			for (i = yni - 1; i > ynf; i--){
+				if (amazonas[xi][i] != ' '){
+					break;
+				}
+			}
+		}
+		else {
+			for (i = yni + 1; i < ynf; i++){
+				if (amazonas[xi][i] != ' '){
+					break;
+				}
+			}
+		}
+		if (i != ynf){
+			printf("Existe uma peca entre o movimento selecionado.\n");
+			scanf("%s", texto);
+			return 0;
+		}
+	}
+	else{
+		if (yni == ynf){
+			if (xi > xf){
+				for (i = xi - 1; i > xf; i--){
+					if (amazonas[i][yni] != ' '){
+						break;
+					}
+				}
+			}
+			else {
+				for (i = xi + 1; i < xf; i++){
+					if (amazonas[i][yni] != ' '){
+						break;
+					}
+				}
+			}
+			if (i != xf){
+				printf("Existe uma peca entre o movimento selecionado.\n");
+				scanf("%s", texto);
+				return 0;
+			}
+		}
+		else {
+			if ((xi - xf) == (yni - ynf)){
+				if (xi > xf){
+					for (i = xi - 1; i > xf; i--){
+						if (amazonas[i][yni - (xi - i)] != ' '){
+							break;
+						}
+					}
+				}
+				else {
+					for (i = xi + 1; i < xf; i++){
+						if (amazonas[i][yni + (i - xi)] != ' '){
+							break;
+						}
+					}
+				}
+				if (i != xf){
+					printf("Existe uma peca entre o lancamento selecionado.\n");
+					scanf("%s", texto);
+					return 0;
+				}
+			}
+			else {
+				if((xi - xf) == ((yni - ynf) * -1)){
+					if (xi > xf){
+						for (i = xi - 1; i > xf; i--){
+							if (amazonas[i][yni + (xi - i)] != ' '){
+								break;
+							}
+						}
+					}
+					else {
+						for (i = xi + 1; i < xf; i++){
+							if (amazonas[i][yni - (i - xi)] != ' '){
+								break;
+							}
+						}
+					}
+					if (i != xf){
+						printf("Existe uma peca entre o lancamento selecionado.\n");
+						scanf("%s", texto);
+						return 0;
+					}
+				}
+				else {
+					printf("Lancamento invalido\n");
+					scanf("%s", texto);
+					return 0;
+				}
+			}
+		}
+	}
+    return 1;
+}
+
+/* ===== Valida o lancamento da flecha ===== */
 int validaLancamento(int xi, int yi, int xf, char yf){
 	int i = 0;
 	int yni = 0;
@@ -202,122 +301,18 @@ int validaLancamento(int xi, int yi, int xf, char yf){
 		return 0;
 	}
 
-	if (xi == xf){
-		if (yni > ynf){
-			for (i = yni - 1; i > ynf; i--){
-				if (amazonas[xi][i] != ' '){
-					printf("%c\n",amazonas[xi][i]);
-					break;
-				}
-			}
-		}
-		else {
-			for (i = yni + 1; i < ynf; i++){
-				if (amazonas[xi][i] != ' '){
-					printf("%c\n",amazonas[xi][i]);
-					break;
-				}
-			}
-		}
-		printf("I:%i YNF:%i\n",i, ynf);
-		if (i != ynf){
-			printf("Existe uma peca entre o lancamento selecionado.\n");
-			scanf("%s", texto);
-			return 0;
-		}
-	}
-	else{
-		if (yni == ynf){
-			if (xi > xf){
-				for (i = xi - 1; i > xf; i--){
-					if (amazonas[i][yni] != ' '){
-						printf("%c\n",amazonas[xi][i]);
-						break;
-					}
-				}
-			}
-			else {
-				for (i = xi + 1; i < xf; i++){
-					if (amazonas[i][yni] != ' '){
-						printf("%c\n",amazonas[xi][i]);
-						break;
-					}
-				}
-			}
-			printf("I:%i YNF:%i\n",i, ynf);
-			if (i != xf){
-				printf("Existe uma peca entre o lancamento selecionado.\n");
-				scanf("%s", texto);
-				return 0;
-			}
-		}
-		else {
-			if ((xi - xf) == (yni - ynf)){
-				if (xi > xf){
-					for (i = xi - 1; i > xf; i--){
-						if (amazonas[i][yni - (xi - i)] != ' '){
-							printf("%c\n",amazonas[xi][i]);
-							break;
-						}
-					}
-				}
-				else {
-					for (i = xi + 1; i < xf; i++){
-						if (amazonas[i][yni + (i - xi)] != ' '){
-							printf("%c\n",amazonas[xi][i]);
-							break;
-						}
-					}
-				}
-				printf("I:%i YNF:%i\n",i, ynf);
-				if (i != xf){
-					printf("Existe uma peca entre o lancamento selecionado.\n");
-					scanf("%s", texto);
-					return 0;
-				}
-			}
-			else {
-				if((xi - xf) == ((yni - ynf) * -1)){
-					if (xi > xf){
-						for (i = xi - 1; i > xf; i--){
-							if (amazonas[i][yni + (xi - i)] != ' '){
-								printf("%c\n",amazonas[xi][i]);
-								break;
-							}
-						}
-					}
-					else {
-						for (i = xi + 1; i < xf; i++){
-							if (amazonas[i][yni - (i - xi)] != ' '){
-								printf("%c\n",amazonas[xi][i]);
-								break;
-							}
-						}
-					}
-					printf("I:%i YNF:%i\n",i, ynf);
-					if (i != xf){
-						printf("Existe uma peca entre o lancamento selecionado.\n");
-						scanf("%s", texto);
-						return 0;
-					}
-				}
-				else {
-					printf("Lancamento invalido\n");
-					scanf("%s", texto);
-					return 0;
-				}
-			}
-		}
-	}
+    if (!analisaPeriodos(xi, yni, xf, ynf)){
+        printf("Lancamento invalido\n");
+        return 0;
+    }
 
     amazonas[xf][ynf] = 'F';
-
 	scanf("%s", texto);
 
 	return 1;
 }
 
-/* Le posicao final da flecha. Posicao inicial e a posicao final da peca */
+/* ===== Le posicao final da flecha. ===== */
 void leCoorFlecha(int coorXf, int coorYf){
     char texto[3];
 	int numFim;
@@ -339,21 +334,17 @@ void leCoorFlecha(int coorXf, int coorYf){
 
     if (validaCoordenadas(numFim,caracFim)){
 		/* testar validacao para executar movimentacao de forma correta. */
-		if (validaLancamento(coorXf, coorYf, numFim, caracFim)){
-			printf("Movimentacao OK\n");
-		}
-		else{
+		if (!validaLancamento(coorXf, coorYf, numFim, caracFim)){
 		    goto FLECHA;
 		}
 	}
 	else {
 		goto FLECHA;
 	}
-
 	return;
 }
 
-/* Verifica se a peca esta cercada */
+/* ====== Verifica se a peca esta cercada ====== */
 char pecaCercada(char i, char j){
     if (i==0)
         if (j==0) return amazonas[i+1][j] != ' ' && amazonas[i+1][j+1] != ' ' && amazonas[i][j+1] != ' ';
@@ -374,8 +365,7 @@ char pecaCercada(char i, char j){
     return 0;
 }
 
-
-/* Valida as pecas da jogada */
+/* ======== Valida as pecas da jogada ========= */
 void validaJogada(){
     int i = 0;
     int j = 0;
@@ -384,32 +374,29 @@ void validaJogada(){
         for(j = 0; j < 10; j++){
             if ((amazonas[i][j] == 'P') || (amazonas[i][j] == 'B')){
                 if (pecaCercada(i, j)){
-                    if (vezJogador) qtdeBrancas++;
+                    if (amazonas[i][j] == 'B') qtdeBrancas++;
                     else qtdePretas++;
                 }
             }
         }
     }
-
     if(qtdeBrancas == 4){
         fimJogo++;
-        printf("O Jogador com as pecas de cor preta ganhou o jogo");
+        printf("O Jogador com as pecas de cor preta ganhou o jogo\n");
         return;
     }
     if(qtdePretas == 4){
         fimJogo++;
-        printf("O Jogador com as pecas de cor branca ganhou o jogo");
+        printf("O Jogador com as pecas de cor branca ganhou o jogo\n");
         return;
     }
 }
 
-
-/* valida jogadas verificando posicoes, intervalo da movimentacao e coisas do tipo */
+/* ===== Valida jogadas verificando posicoes, intervalo da movimentacao e coisas do tipo ======= */
 int validaMovimentacao(int xi, char yi, int xf, char yf){
 	int i = 0;
 	int yni = 0;
 	int ynf = 0;
-
 	char texto[3]; /* variavel para esperar a interacao do usuario */
 
 	yni = trocaTipo(yi);
@@ -418,9 +405,6 @@ int validaMovimentacao(int xi, char yi, int xf, char yf){
 	xf--;
 	yni--;
 	ynf--;
-
-	printf("XI: %i, YI: %i, XF: %i, YF: %i", xi, yni, xf, ynf);
-	scanf("%s", texto);
 
 	if(vezJogador){
 		/* Jogada das pecas Brancas, testa se peca selecionada e branca*/
@@ -438,7 +422,6 @@ int validaMovimentacao(int xi, char yi, int xf, char yf){
 			return 0;
 		}
 	}
-
 	/* testa se posicao final ja esta ocupada */
 	if(amazonas[xf][ynf] != ' '){
 		printf("Destino ja esta ocupado. Selecione outro destino!\n");
@@ -451,123 +434,11 @@ int validaMovimentacao(int xi, char yi, int xf, char yf){
 		return 0;
 	}
 
-	if (xi == xf){
-		if (yni > ynf){
-			for (i = yni - 1; i > ynf; i--){
-				if (amazonas[xi][i] != ' '){
-					printf("%c\n",amazonas[xi][i]);
-					break;
-				}
-			}
-		}
-		else {
-			for (i = yni + 1; i < ynf; i++){
-				if (amazonas[xi][i] != ' '){
-					printf("%c\n",amazonas[xi][i]);
-					break;
-				}
-			}
-		}
-		printf("I:%i YNF:%i\n",i, ynf);
-		if (i != ynf){
-			printf("Existe uma peca entre o movimento selecionado.\n");
-			scanf("%s", texto);
-			return 0;
-		}
-	}
-	else{
-		if (yni == ynf){
-			if (xi > xf){
-				for (i = xi - 1; i > xf; i--){
-					if (amazonas[i][yni] != ' '){
-						printf("%c\n",amazonas[xi][i]);
-						break;
-					}
-				}
-			}
-			else {
-				for (i = xi + 1; i < xf; i++){
-					if (amazonas[i][yni] != ' '){
-						printf("%c\n",amazonas[xi][i]);
-						break;
-					}
-				}
-			}
-			printf("I:%i XF:%i\n",i, xf);
-			if (i != xf){
-				printf("Existe uma peca entre o movimento selecionado.\n");
-				scanf("%s", texto);
-				return 0;
-			}
-		}
-		else {
-		    /* Verificar a parte desse processo que nao esta funcionando corretamente */
-			if ((xi - xf) == (yni - ynf)){
-			    printf("antes do laco");
-			    scanf("%s", texto);
-				if (xi > xf){
-				    printf("Final menor");
-					for (i = xi - 1; i > xf; i--){
-						if (amazonas[i][yni - (xi - i) - 1] != ' '){
-							printf("%c\n",amazonas[xi][i]);
-                            scanf("%s", texto);
-							break;
-						}
-					}
-				}
-				else {
-				    printf("Final maior");
-				    scanf("%s", texto);
-					for (i = xi + 1; i < xf; i++){
-						if (amazonas[i][yni + (i - xi) - 1] != ' '){
-							printf("%c\n",amazonas[xi][i]);
-							scanf("%s", texto);
-							break;
-						}
-					}
-				}
-				printf("I:%i XF:%i\n",i, xf);
-				if (i != xf){
-					printf("Existe uma peca entre o movimento selecionado.\n");
-					scanf("%s", texto);
-					return 0;
-				}
-			}
-			else {
-			    /* e desse processo tambem que esta dando merda, 1 em 1 funciona, mais que isso da pau! =P */
-				if((xi - xf) == ((yni - ynf) * -1)){
-					if (xi > xf){
-						for (i = xi - 1; i > xf; i--){
-							if (amazonas[i][yni + (xi - i)] != ' '){
-								printf("%c\n",amazonas[xi][i]);
-								break;
-							}
-						}
-					}
-					else {
-						for (i = xi + 1; i < xf; i++){
-							if (amazonas[i][yni - (i - xi)] != ' '){
-								printf("%c\n",amazonas[xi][i]);
-								break;
-							}
-						}
-					}
-					printf("I:%i XF:%i\n",i, xf);
-					if (i != xf){
-						printf("Existe uma peca entre o movimento selecionado.\n");
-						scanf("%s", texto);
-						return 0;
-					}
-				}
-				else {
-					printf("Movimentacao invalida\n");
-					scanf("%s", texto);
-					return 0;
-				}
-			}
-		}
-	}
-
+    if (!analisaPeriodos(xi, yni, xf, ynf)){
+        printf("Movimento invalido\n");
+        scanf("%s",texto);
+        return 0;
+    }
 	/* movimentacao */
     if (vezJogador){
         amazonas[xf][ynf] = 'B';
@@ -577,18 +448,13 @@ int validaMovimentacao(int xi, char yi, int xf, char yf){
         amazonas[xf][ynf] = 'P';
         amazonas[xi][yni] = ' ';
     }
-
 	scanf("%s", texto);
-
-	/* Se estiver todo certo, nesse mesmo processo ele executa a movimentacao, definindo sua nova
-	posicao e limpando a poscao anterior. O movimento seguinte sera o lancamento da flecha, seguindo
-	as mesmas regras que a movimentacao */
     leCoorFlecha(xf + 1, ynf + 1);
 
 	return 1;
 }
 
-/* le posicoes iniciais de movimentacoes e finais para pecas */
+/* ======== Le posicoes iniciais de movimentacoes e finais para pecas =========== */
 void leCoordPeca(){
 	char texto[3];
 	int numIni;
@@ -627,10 +493,7 @@ void leCoordPeca(){
 
 		if (validaCoordenadas(numFim,caracFim)){
 			/* testar validacao para executar movimentacao de forma correta. */
-			if (validaMovimentacao(numIni, caracIni, numFim, caracFim)){
-				printf("Movimentacao OK\n");
-			}
-			else {
+			if (!validaMovimentacao(numIni, caracIni, numFim, caracFim)){
 				goto INICIAL;
 			}
 		}
@@ -641,12 +504,11 @@ void leCoordPeca(){
 	else {
 		goto INICIAL;
 	}
-
 	validaJogada();
-
 	return;
 }
 
+/* ========= Processo principal do programa ============ */
 int main(){
 	system("cls");
 	imprimeTabuleiro();
@@ -656,6 +518,5 @@ int main(){
 		leCoordPeca();
 		trocaJogador();
 	}
-
 	return 0;
 }
