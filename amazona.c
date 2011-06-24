@@ -1,9 +1,10 @@
 /* ===================== main.c ======================= */
 #include <stdio.h>
+
 #include <conio.h>
 #include <dos.h>
 #include <windows.h> // inclua esse header se for usar no devc++
-//#include <cstdlib> // inclua esse header se for usar no devc++
+//#include <cstdlib> inclua esse header se for usar no devc++
 #include <stdlib.h>
 
 /* ==== Matriz principal do programa ==== */
@@ -32,6 +33,7 @@ void gotoxy(int x, int y){
 HANDLE hstdout;
     hstdout = GetStdHandle(STD_OUTPUT_HANDLE);
     SetConsoleCursorPosition(hstdout,(COORD) {y,x});
+	//printf("\033[%i;%if",x,y);
 }
 
 /* ========== Processo que imprime o tabuleiro ============ */
@@ -65,12 +67,10 @@ void imprimePecas(char tipoPeca, int x, int y){
       (x > 10 ) &&
       (y == 0)){
     gotoxy(34,0);
-    printf("Jogada Invalida!\n");
     return;
   }
   x = x * 3;
   y = (y - 1) * 7 + 3;
-
   x--;
   y--;
 
@@ -161,7 +161,8 @@ int validaCoordenadas(int num, char carac){
 		desenhaTela();
 		return 0;
 	}
-	if ((toupper(carac) <= 65) || (toupper(carac) >= 74) ){
+
+	if ((toupper(carac) < 65) || (toupper(carac) > 74) ){
 		desenhaTela();
 		return 0;
 	}
@@ -286,9 +287,6 @@ int validaLancamento(int xi, int yi, int xf, char yf){
 	yni--;
 	ynf--;
 
-	printf("XI: %i, YI: %i, XF: %i, YF: %i", xi, yni, xf, ynf);
-	scanf("%s", texto);
-
 	/* testa se posicao final ja esta ocupada */
 	if(amazonas[xf][ynf] != ' '){
 		printf("Destino ja esta ocupado. Selecione outro destino!\n");
@@ -307,7 +305,6 @@ int validaLancamento(int xi, int yi, int xf, char yf){
     }
 
     amazonas[xf][ynf] = 'F';
-	scanf("%s", texto);
 
 	return 1;
 }
@@ -369,6 +366,8 @@ char pecaCercada(char i, char j){
 void validaJogada(){
     int i = 0;
     int j = 0;
+	qtdeBrancas = 0;
+	qtdePretas  = 0;
 
     for(i = 0; i < 10; i++){
         for(j = 0; j < 10; j++){
@@ -380,6 +379,7 @@ void validaJogada(){
             }
         }
     }
+
     if(qtdeBrancas == 4){
         fimJogo++;
         printf("O Jogador com as pecas de cor preta ganhou o jogo\n");
@@ -448,7 +448,7 @@ int validaMovimentacao(int xi, char yi, int xf, char yf){
         amazonas[xf][ynf] = 'P';
         amazonas[xi][yni] = ' ';
     }
-	scanf("%s", texto);
+/*	scanf("%s", texto); */
     leCoorFlecha(xf + 1, ynf + 1);
 
 	return 1;
@@ -510,10 +510,7 @@ void leCoordPeca(){
 
 /* ========= Processo principal do programa ============ */
 int main(){
-	system("cls");
-	imprimeTabuleiro();
-	montaPecas(amazonas);
-
+    desenhaTela();
 	while (!fimJogo){
 		leCoordPeca();
 		trocaJogador();
