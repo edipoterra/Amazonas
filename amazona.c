@@ -1,10 +1,10 @@
 /* ===================== main.c ======================= */
 #include <stdio.h>
-
 #include <conio.h>
 #include <dos.h>
-#include <windows.h> // inclua esse header se for usar no devc++
+#include <windows.h> //inclua esse header se for usar no devc++
 //#include <cstdlib> inclua esse header se for usar no devc++
+
 #include <stdlib.h>
 
 /* ==== Matriz principal do programa ==== */
@@ -61,6 +61,8 @@ void imprimeTabuleiro(){
 
 /* === Processo que imprime as pecas na posicao passada por parametro === */
 void imprimePecas(char tipoPeca, int x, int y){
+  tipoPeca = toupper(tipoPeca);
+
   if ((tipoPeca != 'B') &&
       (tipoPeca != 'P') &&
       (tipoPeca != 'F') &&
@@ -103,6 +105,7 @@ void imprimePecas(char tipoPeca, int x, int y){
 
 /* === Recebe letra e converte para numero, para parametrizar coordenadas === */
 int trocaTipo(char letra){
+  letra = toupper(letra);
   switch (letra){
     case 'A':	return 1;
     case 'B':	return 2;
@@ -305,6 +308,7 @@ int validaLancamento(int xi, int yi, int xf, char yf){
     }
 
     amazonas[xf][ynf] = 'F';
+	scanf("%s", texto);
 
 	return 1;
 }
@@ -371,14 +375,24 @@ void validaJogada(){
 
     for(i = 0; i < 10; i++){
         for(j = 0; j < 10; j++){
-            if ((amazonas[i][j] == 'P') || (amazonas[i][j] == 'B')){
+            if ((toupper(amazonas[i][j]) == 'P') || (toupper(amazonas[i][j]) == 'B')){
                 if (pecaCercada(i, j)){
-                    if (amazonas[i][j] == 'B') qtdeBrancas++;
-                    else qtdePretas++;
+                    if (toupper(amazonas[i][j]) == 'B'){
+                      qtdeBrancas++;
+                      amazonas[i][j] = 'b';
+                    }
+                    else{
+                      qtdePretas++;
+                      amazonas[i][j] = 'p';
+                    }
                 }
             }
         }
     }
+
+	printf("Brancas: %i\n",qtdeBrancas);
+	printf("Pretas: %i\n",qtdePretas);
+	scanf("%i", &qtdePretas);
 
     if(qtdeBrancas == 4){
         fimJogo++;
@@ -408,19 +422,29 @@ int validaMovimentacao(int xi, char yi, int xf, char yf){
 
 	if(vezJogador){
 		/* Jogada das pecas Brancas, testa se peca selecionada e branca*/
-		if(amazonas[xi][yni] != 'B'){
+		if(toupper(amazonas[xi][yni]) != 'B'){
 			printf("Peca selecionada nao e Branca. Selecione uma peca Branca!\n");
 			scanf("%s", texto);
 			return 0;
 		}
+                if(amazonas[xi][yni] == 'b'){
+                  printf("Peca esta bloqueada. Selecione outra!\n");
+                  scanf("%s",texto);
+                  return 0;
+                }
 	}
 	else {
 		/* Jogada das pecas Pretas, testa se peca selecionada e preta */
-		if(amazonas[xi][yni] != 'P'){
+		if(toupper(amazonas[xi][yni]) != 'P'){
 			printf("Peca selecionada nao e Preta. Selecione uma peca Preta!\n");
 			scanf("%s", texto);
 			return 0;
 		}
+                if(amazonas[xi][yni] == 'p'){
+                  printf("Peca esta bloqueada. Selecione outra!\n");
+                  scanf("%s",texto);
+                  return 0;
+                }
 	}
 	/* testa se posicao final ja esta ocupada */
 	if(amazonas[xf][ynf] != ' '){
@@ -510,7 +534,10 @@ void leCoordPeca(){
 
 /* ========= Processo principal do programa ============ */
 int main(){
-    desenhaTela();
+	system("cls");
+	imprimeTabuleiro();
+	montaPecas(amazonas);
+
 	while (!fimJogo){
 		leCoordPeca();
 		trocaJogador();
