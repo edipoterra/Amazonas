@@ -194,7 +194,8 @@ int analisaPeriodos(int xi, int yni, int xf, int ynf){
 		}
 		if (i != ynf){
 			printf("Existe uma peca entre o movimento selecionado.\n");
-			scanf("%s", texto);
+			fflush(stdin);
+			getchar();
 			return 0;
 		}
 	}
@@ -216,7 +217,8 @@ int analisaPeriodos(int xi, int yni, int xf, int ynf){
 			}
 			if (i != xf){
 				printf("Existe uma peca entre o movimento selecionado.\n");
-				scanf("%s", texto);
+                fflush(stdin);
+                getchar();
 				return 0;
 			}
 		}
@@ -238,7 +240,8 @@ int analisaPeriodos(int xi, int yni, int xf, int ynf){
 				}
 				if (i != xf){
 					printf("Existe uma peca entre o lancamento selecionado.\n");
-					scanf("%s", texto);
+                    fflush(stdin);
+                    getchar();
 					return 0;
 				}
 			}
@@ -260,13 +263,15 @@ int analisaPeriodos(int xi, int yni, int xf, int ynf){
 					}
 					if (i != xf){
 						printf("Existe uma peca entre o lancamento selecionado.\n");
-						scanf("%s", texto);
+                        fflush(stdin);
+                        getchar();
 						return 0;
 					}
 				}
 				else {
 					printf("Lancamento invalido\n");
-					scanf("%s", texto);
+                    fflush(stdin);
+                    getchar();
 					return 0;
 				}
 			}
@@ -293,22 +298,25 @@ int validaLancamento(int xi, int yi, int xf, char yf){
 	/* testa se posicao final ja esta ocupada */
 	if(amazonas[xf][ynf] != ' '){
 		printf("Destino ja esta ocupado. Selecione outro destino!\n");
-		scanf("%s", texto);
+        fflush(stdin);
+        getchar();
 		return 0;
 	}
 	if ((xi == xf) && (yni == ynf)){
 		printf("Coordenadas iguais. Defina um destino diferente do inicio!\n");
-		scanf("%s", texto);
+		fflush(stdin);
+		getchar();
 		return 0;
 	}
 
     if (!analisaPeriodos(xi, yni, xf, ynf)){
         printf("Lancamento invalido\n");
+        fflush(stdin);
+        getchar();
         return 0;
     }
 
     amazonas[xf][ynf] = 'F';
-	scanf("%s", texto);
 
 	return 1;
 }
@@ -322,6 +330,7 @@ void leCoorFlecha(int coorXf, int coorYf){
 	FLECHA:
 	desenhaTela();
 	printf("Entre com as coordenadas do destino da flecha: \n");
+	fflush(stdin);
 	scanf("%s",texto);
 
 	if (texto[2] != '\0'){
@@ -390,10 +399,18 @@ void validaJogada(){
         }
     }
 
-	printf("Brancas: %i\n",qtdeBrancas);
-	printf("Pretas: %i\n",qtdePretas);
-	scanf("%i", &qtdePretas);
-
+    if ((qtdeBrancas == 4)&&(qtdePretas == 4)){
+        if (vezJogador){
+            fimJogo++;
+            printf("O Jogador com as pecas de cor branca ganhou o jogo\n");
+            return;
+        }
+        else{
+            fimJogo++;
+            printf("O Jogador com as pecas de cor preta ganhou o jogo\n");
+            return;
+        }
+    }
     if(qtdeBrancas == 4){
         fimJogo++;
         printf("O Jogador com as pecas de cor preta ganhou o jogo\n");
@@ -424,43 +441,51 @@ int validaMovimentacao(int xi, char yi, int xf, char yf){
 		/* Jogada das pecas Brancas, testa se peca selecionada e branca*/
 		if(toupper(amazonas[xi][yni]) != 'B'){
 			printf("Peca selecionada nao e Branca. Selecione uma peca Branca!\n");
-			scanf("%s", texto);
+			fflush(stdin);
+			getchar();
 			return 0;
 		}
-                if(amazonas[xi][yni] == 'b'){
-                  printf("Peca esta bloqueada. Selecione outra!\n");
-                  scanf("%s",texto);
-                  return 0;
-                }
+        if(amazonas[xi][yni] == 'b'){
+            printf("Peca esta bloqueada. Selecione outra!\n");
+            fflush(stdin);
+            getchar();
+            return 0;
+        }
 	}
 	else {
 		/* Jogada das pecas Pretas, testa se peca selecionada e preta */
 		if(toupper(amazonas[xi][yni]) != 'P'){
 			printf("Peca selecionada nao e Preta. Selecione uma peca Preta!\n");
-			scanf("%s", texto);
+			fflush(stdin);
+			getchar();
+
 			return 0;
 		}
-                if(amazonas[xi][yni] == 'p'){
-                  printf("Peca esta bloqueada. Selecione outra!\n");
-                  scanf("%s",texto);
-                  return 0;
-                }
+        if(amazonas[xi][yni] == 'p'){
+            printf("Peca esta bloqueada. Selecione outra!\n");
+			fflush(stdin);
+			getchar();
+            return 0;
+        }
 	}
 	/* testa se posicao final ja esta ocupada */
 	if(amazonas[xf][ynf] != ' '){
 		printf("Destino ja esta ocupado. Selecione outro destino!\n");
-		scanf("%s", texto);
+		fflush(stdin);
+		getchar();
 		return 0;
 	}
 	if ((xi == xf) && (yni == ynf)){
 		printf("Coordenadas iguais. Defina um destino diferente do inicio!\n");
-		scanf("%s", texto);
+		fflush(stdin);
+		getchar();
 		return 0;
 	}
 
     if (!analisaPeriodos(xi, yni, xf, ynf)){
         printf("Movimento invalido\n");
-        scanf("%s",texto);
+		fflush(stdin);
+		getchar();
         return 0;
     }
 	/* movimentacao */
@@ -472,7 +497,7 @@ int validaMovimentacao(int xi, char yi, int xf, char yf){
         amazonas[xf][ynf] = 'P';
         amazonas[xi][yni] = ' ';
     }
-/*	scanf("%s", texto); */
+
     leCoorFlecha(xf + 1, ynf + 1);
 
 	return 1;
@@ -480,7 +505,7 @@ int validaMovimentacao(int xi, char yi, int xf, char yf){
 
 /* ======== Le posicoes iniciais de movimentacoes e finais para pecas =========== */
 void leCoordPeca(){
-	char texto[3];
+	char texto[3] = {' ',' ',' '};
 	int numIni;
 	int numFim;
 	char caracIni;
@@ -489,6 +514,7 @@ void leCoordPeca(){
 	INICIAL:
 	desenhaTela();
 	printf("Entre com as coordenadas iniciais da peca: \n");
+	fflush(stdin);
 	scanf("%s",texto);
 
 	if (texto[2] != '\0'){
@@ -496,14 +522,15 @@ void leCoordPeca(){
 		numIni = (texto[0] - '0') * 10 + (texto[1] - '0');
 	}
 	else{
-		caracFim = texto[1];
-		numFim = texto[0] - '0';
+		caracIni = texto[1];
+		numIni = texto[0] - '0';
 	}
 
 	if (validaCoordenadas(numIni,caracIni)){
 		FINAL:
 		desenhaTela();
 		printf("Entre com as coordenadas finais da peca: \n");
+        fflush(stdin);
 		scanf("%s",texto);
 
 		if (texto[2] != '\0'){
@@ -534,9 +561,7 @@ void leCoordPeca(){
 
 /* ========= Processo principal do programa ============ */
 int main(){
-	system("cls");
-	imprimeTabuleiro();
-	montaPecas(amazonas);
+    desenhaTela();
 
 	while (!fimJogo){
 		leCoordPeca();
